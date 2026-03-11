@@ -76,8 +76,10 @@ async def _grade_with_gemini(prompt: str) -> str:
 
 
 async def _grade_with_local_model(prompt: str) -> str:
-    base_url = os.environ.get("OLLAMA_URL", "http://localhost:11434")
-    local_model = os.environ.get("LOCAL_MODEL_NAME", "qwen2.5:3b-instruct")
+    base_url = os.environ.get("OLLAMA_URL")
+    local_model = os.environ.get("LOCAL_MODEL_NAME")
+    if not base_url or not local_model:
+        raise RuntimeError("OLLAMA_URL and LOCAL_MODEL_NAME must be configured for local grading")
     async with httpx.AsyncClient(timeout=120) as client:
         response = await client.post(
             f"{base_url}/api/generate",

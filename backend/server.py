@@ -11,6 +11,7 @@ from dotenv import load_dotenv
 from fastapi import APIRouter, Depends, FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
+from starlette.background import BackgroundTask
 from motor.motor_asyncio import AsyncIOMotorClient
 
 try:
@@ -451,8 +452,11 @@ async def analytics(session_id: str, current: Dict = Depends(get_current_instruc
 
     bins = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
     distribution = []
-    for start, end in zip(bins, bins[1:]):
-        count = len([s for s in scores if start <= s < end])
+    for index, (start, end) in enumerate(zip(bins, bins[1:])):
+        if index == len(bins) - 2:
+            count = len([s for s in scores if start <= s <= end])
+        else:
+            count = len([s for s in scores if start <= s < end])
         distribution.append({"range": f"{start}-{end}", "count": count})
 
     question_totals: Dict[str, Dict[str, float]] = {}
@@ -507,9 +511,15 @@ async def export_grades(session_id: str, current: Dict = Depends(get_current_ins
     dataframe = pd.DataFrame(export_rows)
     temp = NamedTemporaryFile(delete=False, suffix=".xlsx")
     dataframe.to_excel(temp.name, index=False)
+    file_path = Path(temp.name)
 
     safe_title = session_doc["title"].replace(" ", "_")
-    return FileResponse(temp.name, media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", filename=f"{safe_title}_grades.xlsx")
+    return FileResponse(
+        temp.name,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        filename=f"{safe_title}_grades.xlsx",
+        background=BackgroundTask(lambda: file_path.unlink(missing_ok=True)),
+    )
 
 
 @api_router.get("/sessions/{session_id}/plagiarism")
