@@ -199,17 +199,17 @@ async def extract_student_information(raw_text: str, question_paper_text: str = 
         normalized,
     )
     roll_match = re.search(
-        r"(?im)^\s*(?:roll\s*(?:number|no|#)?|reg(?:istration)?\s*(?:number|no|#)?|candidate\s*id|student\s*id)\s*[:\-]\s*([A-Za-z0-9\-_/]+)$",
+        r"(?im)^\s*(?:roll\s*(?:number|no|#)?|reg(?:istration)?\s*(?:number|no|#)?|candidate\s*id|student\s*id)\s*[:\-]\s*([A-Za-z0-9][A-Za-z0-9\-_/\.\s]{0,60})$",
         normalized,
     )
     if not roll_match:
         roll_match = re.search(
-            r"(?i)(?:roll\s*(?:number|no|#)?|reg(?:istration)?\s*(?:number|no|#)?|candidate\s*id|student\s*id)\s*[:\-]\s*([A-Za-z0-9\-_/]+)",
+            r"(?i)(?:roll\s*(?:number|no|#)?|reg(?:istration)?\s*(?:number|no|#)?|candidate\s*id|student\s*id)\s*[:\-]\s*([A-Za-z0-9][A-Za-z0-9\-_/\.\s]{0,60})",
             normalized,
         )
 
     student_name = name_match.group(1).strip() if name_match else "Unknown Student"
-    roll_number = roll_match.group(1).strip() if roll_match else "UNKNOWN"
+    roll_number = roll_match.group(1).strip(" .\t\n") if roll_match else "UNKNOWN"
 
     if student_name == "Unknown Student":
         flags.append("Student name missing")

@@ -39,6 +39,7 @@ Build a production-ready AI-powered Assignment Grading System as a web applicati
 
 ## What’s Implemented
 ### 2026-03-11
+- Added full-app Dark Mode with persistent theme toggle (login + app shell), root `dark` class switching, and token-based styling updates across core pages.
 - Implemented JWT auth APIs: register/login/me
 - Implemented session APIs: create/list/get/update model choice
 - Implemented async bulk upload processing job and progress endpoint

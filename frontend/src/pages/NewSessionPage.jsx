@@ -42,15 +42,15 @@ export default function NewSessionPage() {
 
   return (
     <form className="space-y-6" onSubmit={submit} data-testid="new-session-form">
-      <div className="border-2 border-stone-300 bg-card p-6 space-y-4" data-testid="new-session-header-card">
-        <p className="text-xs uppercase tracking-[0.2em] text-stone-500" data-testid="new-session-kicker">Setup</p>
+      <div className="border-2 border-border bg-card p-6 space-y-4" data-testid="new-session-header-card">
+        <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground" data-testid="new-session-kicker">Setup</p>
         <h2 className="font-heading text-4xl font-extrabold" data-testid="new-session-title">Create Grading Session</h2>
-        <p className="text-stone-600" data-testid="new-session-description">
+        <p className="text-muted-foreground" data-testid="new-session-description">
           Add question paper, answer key, rubric, and default model. You can switch model later in session view.
         </p>
       </div>
 
-      <div className="border-2 border-stone-300 bg-card p-6 space-y-5" data-testid="new-session-fields-card">
+      <div className="border-2 border-border bg-card p-6 space-y-5" data-testid="new-session-fields-card">
         <Input
           placeholder="Session title (e.g., Midterm - Physics A)"
           value={payload.title}
@@ -64,7 +64,7 @@ export default function NewSessionPage() {
           onValueChange={(value) => update("ai_provider", value)}
           data-testid="session-model-select"
         >
-          <SelectTrigger className="rounded-none border-2 border-stone-300" data-testid="session-model-select-trigger">
+          <SelectTrigger className="rounded-none border-2 border-border" data-testid="session-model-select-trigger">
             <SelectValue placeholder="Select model" />
           </SelectTrigger>
           <SelectContent>

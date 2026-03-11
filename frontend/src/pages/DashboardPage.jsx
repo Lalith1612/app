@@ -41,10 +41,10 @@ export default function DashboardPage() {
         />
       </section>
 
-      <section className="border-2 border-stone-300 bg-card p-6" data-testid="sessions-table-section">
+      <section className="border-2 border-border bg-card p-6" data-testid="sessions-table-section">
         <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
           <div>
-            <p className="text-xs uppercase tracking-[0.2em] text-stone-500" data-testid="sessions-list-kicker">
+            <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground" data-testid="sessions-list-kicker">
               Grading Sessions
             </p>
             <h2 className="font-heading text-3xl font-extrabold" data-testid="sessions-list-title">
@@ -59,15 +59,15 @@ export default function DashboardPage() {
         {loading ? (
           <p className="font-mono" data-testid="sessions-loading-text">Loading sessions...</p>
         ) : sessions.length === 0 ? (
-          <div className="border-2 border-dashed border-stone-300 p-8 text-center" data-testid="sessions-empty-state">
+          <div className="border-2 border-dashed border-border p-8 text-center" data-testid="sessions-empty-state">
             <p className="text-lg">No session yet</p>
-            <p className="text-sm text-stone-500">Create your first grading workflow to begin.</p>
+            <p className="text-sm text-muted-foreground">Create your first grading workflow to begin.</p>
           </div>
         ) : (
           <div className="overflow-x-auto" data-testid="sessions-list-wrapper">
             <table className="w-full min-w-[700px]" data-testid="sessions-table">
               <thead>
-                <tr className="border-b-2 border-stone-300 text-left">
+                <tr className="border-b-2 border-border text-left">
                   <th className="py-3" data-testid="sessions-header-title">Title</th>
                   <th className="py-3" data-testid="sessions-header-model">Model</th>
                   <th className="py-3" data-testid="sessions-header-updated">Updated</th>
@@ -76,7 +76,7 @@ export default function DashboardPage() {
               </thead>
               <tbody>
                 {sessions.map((session) => (
-                  <tr key={session.id} className="border-b border-stone-200" data-testid={`session-row-${session.id}`}>
+                  <tr key={session.id} className="border-b border-border" data-testid={`session-row-${session.id}`}>
                     <td className="py-3 font-medium" data-testid={`session-title-${session.id}`}>{session.title}</td>
                     <td className="py-3 font-mono" data-testid={`session-model-${session.id}`}>{session.ai_provider}</td>
                     <td className="py-3" data-testid={`session-updated-${session.id}`}>

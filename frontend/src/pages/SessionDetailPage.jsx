@@ -203,28 +203,28 @@ export default function SessionDetailPage() {
 
   return (
     <div className="space-y-8" data-testid="session-detail-page-root">
-      <section className="border-2 border-stone-300 bg-card p-6 space-y-5" data-testid="session-header-card">
+      <section className="border-2 border-border bg-card p-6 space-y-5" data-testid="session-header-card">
         <div className="flex flex-wrap gap-4 items-start justify-between">
           <div>
-            <p className="text-xs uppercase tracking-[0.2em] text-stone-500" data-testid="session-header-kicker">
+            <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground" data-testid="session-header-kicker">
               Session Workspace
             </p>
             <h2 className="font-heading text-4xl font-extrabold" data-testid="session-header-title">{session.title}</h2>
-            <p className="text-sm text-stone-600" data-testid="session-header-subtitle">
+            <p className="text-sm text-muted-foreground" data-testid="session-header-subtitle">
               Upload assignments, run AI grading, review marks, and export grade sheet.
             </p>
           </div>
 
           <div className="grid sm:grid-cols-3 gap-3" data-testid="session-summary-grid">
-            <div className="border-2 border-stone-200 px-4 py-2" data-testid="session-summary-total">
+            <div className="border-2 border-border px-4 py-2" data-testid="session-summary-total">
               <p className="text-xs">Submissions</p>
               <p className="font-mono text-xl" data-testid="session-summary-total-value">{summary.total}</p>
             </div>
-            <div className="border-2 border-stone-200 px-4 py-2" data-testid="session-summary-graded">
+            <div className="border-2 border-border px-4 py-2" data-testid="session-summary-graded">
               <p className="text-xs">Graded</p>
               <p className="font-mono text-xl" data-testid="session-summary-graded-value">{summary.graded}</p>
             </div>
-            <div className="border-2 border-stone-200 px-4 py-2" data-testid="session-summary-flagged">
+            <div className="border-2 border-border px-4 py-2" data-testid="session-summary-flagged">
               <p className="text-xs">Plagiarism Flags</p>
               <p className="font-mono text-xl" data-testid="session-summary-flagged-value">{summary.flagged}</p>
             </div>
@@ -238,7 +238,7 @@ export default function SessionDetailPage() {
             disabled={modelSaving}
             data-testid="session-model-switch-select"
           >
-            <SelectTrigger className="rounded-none border-2 border-stone-300" data-testid="session-model-switch-trigger">
+            <SelectTrigger className="rounded-none border-2 border-border" data-testid="session-model-switch-trigger">
               <SelectValue placeholder="Choose model" />
             </SelectTrigger>
             <SelectContent>
@@ -259,7 +259,7 @@ export default function SessionDetailPage() {
         <div
           {...getRootProps()}
           className={`border-2 border-dashed p-8 text-center cursor-pointer transition-all ${
-            isDragActive ? "border-primary bg-accent/40" : "border-stone-300"
+            isDragActive ? "border-primary bg-accent/40" : "border-border"
           }`}
           data-testid="submission-dropzone"
         >
@@ -267,14 +267,14 @@ export default function SessionDetailPage() {
           <p className="font-medium" data-testid="submission-dropzone-title">
             {isDragActive ? "Drop the files now" : "Drag & drop PDF/DOCX/TXT/ZIP files here"}
           </p>
-          <p className="text-sm text-stone-500" data-testid="submission-dropzone-helper">Bulk upload supported</p>
+          <p className="text-sm text-muted-foreground" data-testid="submission-dropzone-helper">Bulk upload supported</p>
         </div>
 
         {job && (
-          <div className="border-2 border-stone-200 p-3" data-testid="job-progress-card">
+          <div className="border-2 border-border p-3" data-testid="job-progress-card">
             <p className="text-sm" data-testid="job-progress-message">{job.message}</p>
             <p className="font-mono" data-testid="job-progress-percent">{job.progress_percent}%</p>
-            <p className="text-xs text-stone-500" data-testid="job-progress-meta">
+            <p className="text-xs text-muted-foreground" data-testid="job-progress-meta">
               Processed: {job.processed_items}/{job.total_items} | Failed: {job.failed_items}
             </p>
           </div>
@@ -282,7 +282,7 @@ export default function SessionDetailPage() {
       </section>
 
       <section className="grid lg:grid-cols-2 gap-6" data-testid="analytics-section">
-        <div className="border-2 border-stone-300 bg-card p-5" data-testid="score-distribution-card">
+        <div className="border-2 border-border bg-card p-5" data-testid="score-distribution-card">
           <h3 className="font-heading text-2xl font-bold mb-4" data-testid="score-distribution-title">Score Distribution</h3>
           <div className="h-[260px]" data-testid="score-distribution-chart">
             <ResponsiveContainer width="100%" height="100%">
@@ -297,7 +297,7 @@ export default function SessionDetailPage() {
           </div>
         </div>
 
-        <div className="border-2 border-stone-300 bg-card p-5" data-testid="difficulty-chart-card">
+        <div className="border-2 border-border bg-card p-5" data-testid="difficulty-chart-card">
           <h3 className="font-heading text-2xl font-bold mb-4" data-testid="difficulty-chart-title">Question Difficulty</h3>
           <div className="h-[260px]" data-testid="difficulty-chart">
             <ResponsiveContainer width="100%" height="100%">
@@ -313,7 +313,7 @@ export default function SessionDetailPage() {
         </div>
       </section>
 
-      <section className="border-2 border-stone-300 bg-card p-5 space-y-6" data-testid="manual-review-section">
+      <section className="border-2 border-border bg-card p-5 space-y-6" data-testid="manual-review-section">
         <h3 className="font-heading text-3xl font-bold" data-testid="manual-review-title">Manual Review Dashboard</h3>
 
         {submissions.length === 0 ? (
@@ -323,13 +323,13 @@ export default function SessionDetailPage() {
             const draft = reviewDrafts[submission.id] || { grading: {}, review_note: "" };
             const gradeKeys = Object.keys(draft.grading);
             return (
-              <div className="border-2 border-stone-200 p-4 space-y-4" key={submission.id} data-testid={`submission-card-${submission.id}`}>
+              <div className="border-2 border-border p-4 space-y-4" key={submission.id} data-testid={`submission-card-${submission.id}`}>
                 <div className="flex flex-wrap justify-between gap-4">
                   <div>
                     <p className="font-semibold" data-testid={`submission-student-${submission.id}`}>
                       {submission.student_name} ({submission.roll_number})
                     </p>
-                    <p className="text-sm text-stone-500" data-testid={`submission-file-${submission.id}`}>
+                    <p className="text-sm text-muted-foreground" data-testid={`submission-file-${submission.id}`}>
                       {submission.filename}
                     </p>
                   </div>
@@ -343,16 +343,16 @@ export default function SessionDetailPage() {
                 </div>
 
                 {submission.extraction_flags?.length > 0 && (
-                  <div className="border-2 border-amber-300 bg-amber-50 p-2" data-testid={`submission-extraction-flags-${submission.id}`}>
+                  <div className="border-2 border-amber-300 bg-amber-50 p-2 dark:border-amber-700 dark:bg-amber-950/40" data-testid={`submission-extraction-flags-${submission.id}`}>
                     <p className="text-sm font-medium">Extraction Flags: {submission.extraction_flags.join(", ")}</p>
                   </div>
                 )}
 
-                <details className="border-2 border-stone-200 p-3" data-testid={`submission-answers-${submission.id}`}>
+                <details className="border-2 border-border p-3" data-testid={`submission-answers-${submission.id}`}>
                   <summary className="cursor-pointer font-medium">View extracted answers</summary>
                   <div className="mt-3 space-y-3">
                     {Object.entries(submission.answers || {}).map(([questionId, answer]) => (
-                      <div key={questionId} className="border border-stone-200 p-2" data-testid={`submission-answer-${submission.id}-${questionId}`}>
+                      <div key={questionId} className="border border-border p-2" data-testid={`submission-answer-${submission.id}-${questionId}`}>
                         <p className="font-mono text-sm">{questionId}</p>
                         <p className="text-sm whitespace-pre-wrap">{answer}</p>
                       </div>
@@ -361,7 +361,7 @@ export default function SessionDetailPage() {
                 </details>
 
                 {gradeKeys.length === 0 ? (
-                  <p className="text-sm text-stone-500" data-testid={`submission-no-grades-${submission.id}`}>
+                  <p className="text-sm text-muted-foreground" data-testid={`submission-no-grades-${submission.id}`}>
                     No AI grade yet. Run grading first.
                   </p>
                 ) : (
