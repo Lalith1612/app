@@ -1,0 +1,159 @@
+{
+  "identity": {
+    "name": "ZenGrade",
+    "archetype": "The Zen Architect",
+    "description": "A grading interface designed for focus and clarity. It avoids the sterile 'LMS Blue' in favor of high-contrast typography, paper-like textures, and 'Brutalist-Light' components. The goal is to make grading feel like a precise, architectural process rather than a chore.",
+    "emotional_tone": "Focused, Precise, Calm, Authoritative",
+    "visual_motif": "Paper Layers, Sharp Edges, Monospace Data, Neon Accents"
+  },
+  "typography": {
+    "primary_font": "Manrope",
+    "secondary_font": "Inter",
+    "mono_font": "JetBrains Mono",
+    "scale": {
+      "h1": "text-4xl md:text-5xl font-extrabold tracking-tight leading-none",
+      "h2": "text-3xl md:text-4xl font-bold tracking-tight",
+      "h3": "text-2xl font-semibold tracking-normal",
+      "body": "text-base font-normal leading-relaxed text-stone-600 dark:text-stone-300",
+      "caption": "text-xs font-medium uppercase tracking-widest text-stone-500",
+      "mono": "font-mono text-sm tracking-tight"
+    },
+    "cdn_links": [
+      "https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&display=swap",
+      "https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap",
+      "https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@100;200;300;400;500;600;700;800&display=swap"
+    ]
+  },
+  "colors": {
+    "palette": {
+      "light": {
+        "background": "#FAFAF9",
+        "foreground": "#0C0A09",
+        "card": "#FFFFFF",
+        "card_foreground": "#0C0A09",
+        "primary": "#F97316",
+        "primary_foreground": "#FFFFFF",
+        "secondary": "#E7E5E4",
+        "secondary_foreground": "#1C1917",
+        "muted": "#F5F5F4",
+        "muted_foreground": "#78716C",
+        "accent": "#FDE68A",
+        "accent_foreground": "#451A03",
+        "destructive": "#EF4444",
+        "destructive_foreground": "#FFFFFF",
+        "border": "#D6D3D1",
+        "input": "#E7E5E4",
+        "ring": "#F97316"
+      },
+      "dark": {
+        "background": "#0C0A09",
+        "foreground": "#FAFAF9",
+        "card": "#1C1917",
+        "card_foreground": "#FAFAF9",
+        "primary": "#FB923C",
+        "primary_foreground": "#0C0A09",
+        "secondary": "#292524",
+        "secondary_foreground": "#FAFAF9",
+        "muted": "#292524",
+        "muted_foreground": "#A8A29E",
+        "accent": "#78350F",
+        "accent_foreground": "#FEF3C7",
+        "destructive": "#991B1B",
+        "destructive_foreground": "#FAFAF9",
+        "border": "#44403C",
+        "input": "#292524",
+        "ring": "#FB923C"
+      }
+    },
+    "usage_rules": [
+      "Do NOT use gradients for backgrounds. Use flat colors or subtle noise textures.",
+      "Primary color (Orange) is ONLY for the main 'Call to Action' (e.g., 'Grade Now', 'Submit').",
+      "Use 'Accent' (Yellow/Amber) for highlighting key data points or active states.",
+      "Borders are significant. Use `border-2` for cards to give a 'constructed' feel.",
+      "Dark mode is NOT just inverted. It's 'Deep Charcoal', not pure black."
+    ]
+  },
+  "components": {
+    "cards": {
+      "style": "Sharp corners (`rounded-none` or `rounded-sm`), 2px solid border (`border-2 border-stone-200 dark:border-stone-700`), flat white background.",
+      "interaction": "On hover: Translate up-left by 2px (`-translate-y-0.5 -translate-x-0.5`) and add a sharp shadow (`shadow-[4px_4px_0px_0px_rgba(0,0,0,0.1)]`).",
+      "padding": "Generous padding (`p-6` or `p-8`)."
+    },
+    "buttons": {
+      "primary": "bg-primary text-primary-foreground font-bold uppercase tracking-wider px-6 py-3 rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all active:translate-x-[4px] active:translate-y-[4px] active:shadow-none border-2 border-black",
+      "secondary": "bg-white text-black border-2 border-black font-bold uppercase tracking-wider px-6 py-3 rounded-none shadow-[4px_4px_0px_0px_rgba(0,0,0,0.1)] hover:bg-stone-50 transition-all",
+      "ghost": "text-stone-600 hover:bg-stone-100 hover:text-black font-medium px-4 py-2 rounded-sm"
+    },
+    "inputs": {
+      "style": "bg-transparent border-b-2 border-stone-300 focus:border-black focus:ring-0 px-0 py-2 rounded-none placeholder:text-stone-400 font-mono text-sm transition-colors",
+      "label": "text-xs font-bold uppercase tracking-widest text-stone-500 mb-1 block"
+    },
+    "badges": {
+      "style": "rounded-full px-3 py-1 text-xs font-bold uppercase tracking-widest border border-current",
+      "variants": {
+        "success": "text-green-600 border-green-600 bg-green-50",
+        "warning": "text-amber-600 border-amber-600 bg-amber-50",
+        "error": "text-red-600 border-red-600 bg-red-50",
+        "neutral": "text-stone-600 border-stone-600 bg-stone-50"
+      }
+    }
+  },
+  "layout": {
+    "grid_system": "Bento Grid (CSS Grid)",
+    "container": "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8",
+    "spacing": "Use generous spacing. `gap-8` for grid items, `my-12` for section separation.",
+    "dashboard_structure": "Sidebar (collapsible, icon-only on mobile) + Main Content Area.",
+    "grading_view": "Split Screen: Left 50% (Document Viewer, sticky), Right 50% (Grading Panel, scrollable). On mobile: Stacked (Document on top, collapsible).",
+    "z_index": {
+      "header": 40,
+      "sidebar": 30,
+      "modal": 50,
+      "toast": 60
+    }
+  },
+  "motion": {
+    "philosophy": "Micro-interactions only. No sweeping page transitions. Snap and precision.",
+    "transitions": "transition-all duration-200 ease-out",
+    "hover_effects": "Lift and shadow sharpness.",
+    "loading": "Skeleton screens with a 'shimmer' effect (`animate-pulse` on stone-200 backgrounds)."
+  },
+  "assets": {
+    "icons": "Lucide React (Stroke width: 1.5px for a thin, precise look).",
+    "images": [
+      {
+        "category": "auth_background",
+        "url": "https://images.unsplash.com/photo-1761854149912-54ced79870ec?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1NTZ8MHwxfHNlYXJjaHwyfHxhYnN0cmFjdCUyMGdlb21ldHJpYyUyMHBhcGVyJTIwbGF5ZXJzJTIwbWluaW1hbGlzdHxlbnwwfHx8fDE3NzMyMjI4NjR8MA&ixlib=rb-4.1.0&q=85",
+        "description": "Abstract white wavy shapes for login page background"
+      },
+      {
+        "category": "empty_state",
+        "url": "https://images.unsplash.com/photo-1770975765382-38dda265ae89?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1NTZ8MHwxfHNlYXJjaHwxfHxhYnN0cmFjdCUyMGdlb21ldHJpYyUyMHBhcGVyJTIwbGF5ZXJzJTIwbWluaW1hbGlzdHxlbnwwfHx8fDE3NzMyMjI4NjR8MA&ixlib=rb-4.1.0&q=85",
+        "description": "Abstract colorful paper shapes for empty dashboard state"
+      }
+    ]
+  },
+  "accessibility": {
+    "contrast": "Ensure text is at least 4.5:1 against background.",
+    "focus_states": "Visible focus rings (2px solid orange) on ALL interactive elements.",
+    "aria_labels": "Mandatory for all icon-only buttons.",
+    "reduced_motion": "Respect `prefers-reduced-motion` media query."
+  },
+  "instructions_to_main_agent": [
+    "Install `Manrope` and `JetBrains Mono` fonts via `index.css` imports.",
+    "Configure `tailwind.config.js` to extend the color palette with the 'stone' scale as the base neutral.",
+    "Update `index.css` with the custom CSS variables for light/dark mode.",
+    "Create a reusable `Card` component that enforces the sharp-corner/thick-border style.",
+    "For the 'Grading View', use a Resizable Panel layout (e.g., `react-resizable-panels`) if possible, or a simple flex/grid split.",
+    "Use `sonner` for toasts, styled to match the 'brutalist-light' theme (square, black border).",
+    "Ensure all interactive elements have `data-testid` attributes."
+  ],
+  "UNIVERSAL_GUIDELINES_FOR_MAIN_AGENT": [
+    "Avoid generic 'SaaS' gradients. Use flat colors and borders.",
+    "Don't center everything. Use asymmetry to create visual interest.",
+    "Use `Manrope` for all headings and `Inter` for body text.",
+    "Use `JetBrains Mono` for all data points (grades, roll numbers, IDs).",
+    "Ensure the 'Split View' for grading is responsive (stacks on mobile).",
+    "Add 'dark mode' support using the `dark:` prefix in Tailwind.",
+    "Use `lucide-react` icons with `stroke-width={1.5}`."
+  ]
+}
