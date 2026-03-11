@@ -39,6 +39,7 @@ Build a production-ready AI-powered Assignment Grading System as a web applicati
 
 ## What’s Implemented
 ### 2026-03-11
+- Completed multi-breakpoint responsive hardening (390/768/1366), fixed dashboard horizontal overflow via `min-w-0` shell constraints and table width tuning, and validated no page cutoff on core routes.
 - Added full-app Dark Mode with persistent theme toggle (login + app shell), root `dark` class switching, and token-based styling updates across core pages.
 - Implemented JWT auth APIs: register/login/me
 - Implemented session APIs: create/list/get/update model choice

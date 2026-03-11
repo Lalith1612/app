@@ -42,8 +42,8 @@ export default function AppShell({ children }) {
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 grid lg:grid-cols-[280px_1fr] gap-8">
-        <aside className="border-2 border-border bg-card p-5 h-fit" data-testid="sidebar-navigation">
+      <div className="max-w-7xl min-w-0 mx-auto px-4 sm:px-6 lg:px-8 py-8 grid lg:grid-cols-[280px_1fr] gap-8">
+        <aside className="min-w-0 border-2 border-border bg-card p-5 h-fit" data-testid="sidebar-navigation">
           <nav className="space-y-3">
             <NavLink to="/" className={navLinkClass} data-testid="nav-dashboard-link">
               <Home className="inline mr-2 h-4 w-4" /> Dashboard
@@ -69,7 +69,7 @@ export default function AppShell({ children }) {
             </Button>
           </nav>
         </aside>
-        <main data-testid="app-main-content">{children}</main>
+        <main className="min-w-0" data-testid="app-main-content">{children}</main>
       </div>
     </div>
   );

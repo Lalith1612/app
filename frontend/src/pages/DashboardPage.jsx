@@ -64,22 +64,22 @@ export default function DashboardPage() {
             <p className="text-sm text-muted-foreground">Create your first grading workflow to begin.</p>
           </div>
         ) : (
-          <div className="overflow-x-auto" data-testid="sessions-list-wrapper">
-            <table className="w-full min-w-[700px]" data-testid="sessions-table">
+          <div className="w-full overflow-x-auto" data-testid="sessions-list-wrapper">
+            <table className="w-full table-auto" data-testid="sessions-table">
               <thead>
                 <tr className="border-b-2 border-border text-left">
-                  <th className="py-3" data-testid="sessions-header-title">Title</th>
-                  <th className="py-3" data-testid="sessions-header-model">Model</th>
-                  <th className="py-3" data-testid="sessions-header-updated">Updated</th>
+                  <th className="py-3 pr-2" data-testid="sessions-header-title">Title</th>
+                  <th className="py-3 pr-2" data-testid="sessions-header-model">Model</th>
+                  <th className="py-3 pr-2" data-testid="sessions-header-updated">Updated</th>
                   <th className="py-3" data-testid="sessions-header-action">Action</th>
                 </tr>
               </thead>
               <tbody>
                 {sessions.map((session) => (
                   <tr key={session.id} className="border-b border-border" data-testid={`session-row-${session.id}`}>
-                    <td className="py-3 font-medium" data-testid={`session-title-${session.id}`}>{session.title}</td>
-                    <td className="py-3 font-mono" data-testid={`session-model-${session.id}`}>{session.ai_provider}</td>
-                    <td className="py-3" data-testid={`session-updated-${session.id}`}>
+                    <td className="py-3 pr-2 font-medium break-words" data-testid={`session-title-${session.id}`}>{session.title}</td>
+                    <td className="py-3 pr-2 font-mono break-words" data-testid={`session-model-${session.id}`}>{session.ai_provider}</td>
+                    <td className="py-3 pr-2 text-sm break-words" data-testid={`session-updated-${session.id}`}>
                       {new Date(session.updated_at).toLocaleString()}
                     </td>
                     <td className="py-3">
