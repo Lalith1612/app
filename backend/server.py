@@ -223,7 +223,10 @@ async def _process_upload_job(job_id: str, session_doc: Dict, files_payload: Lis
         try:
             expanded_docs = expand_submission_file(uploaded["filename"], uploaded["content"])
             for source_name, raw_text in expanded_docs:
-                extracted = extract_student_information(raw_text)
+                extracted = await extract_student_information(
+                    raw_text,
+                    session_doc.get("question_paper_text", ""),
+                )
                 now = utcnow()
                 submission = {
                     "id": str(uuid.uuid4()),

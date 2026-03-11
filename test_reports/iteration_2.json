@@ -1,0 +1,41 @@
+{
+  "summary": "Backend-only regression completed for extraction bug scope via public API: PDF roll synonym detection, answer numbering variants, LLM fallback gating, and persistence through bulk upload all passed.",
+  "backend_issues": {
+    "critical": [],
+    "minor": [
+      {
+        "endpoint": "/api/sessions/{session_id}/bulk-upload",
+        "issue": "roll_number regex currently accepts only [A-Za-z0-9-_/]+; IDs containing spaces/dots (seen in some institutes) will truncate or fail extraction."
+      }
+    ]
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_document_extraction_regression.py",
+    "/app/test_reports/pytest/pytest_results.xml"
+  ],
+  "action_items": [
+    "Broaden roll number capture pattern to include spaces/dots where applicable (e.g., 'REG 2026.01').",
+    "Keep current fallback-gating behavior; no regression seen for 'LLM only when incomplete'."
+  ],
+  "critical_code_review_comments": [
+    "Paragraph inference is effectively delegated to LLM fallback; rule-based parser still collapses unstructured text into Q1 only. This is acceptable for fallback mode but weak for deterministic non-LLM extraction."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_document_extraction_regression.py",
+    "/app/test_reports/iteration_2.json"
+  ],
+  "success_rate": {
+    "backend": "100%",
+    "frontend": "N/A (not requested)"
+  },
+  "seed_data_creation": "Created transient instructor/session/submissions via public API during pytest run.",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Extraction regression tests are now in /app/backend/tests/test_document_extraction_regression.py and validate the reported bug scenarios using generated PDFs + TXT through /bulk-upload.",
+  "rca of the issue": "Previously reported extraction misses are mitigated in current build: roll synonym regex now includes Registration Number/Candidate ID and answer parser covers Question/Que/Ans/numbered forms. Fallback gating worked as intended in tests: complete rule-based docs did not get LLM flag, incomplete docs did."
+}
