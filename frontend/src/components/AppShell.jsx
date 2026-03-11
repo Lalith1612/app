@@ -5,7 +5,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useThemeMode } from "@/context/ThemeContext";
 
 const navLinkClass = ({ isActive }) =>
-  `border-2 px-4 py-2 text-sm font-bold uppercase tracking-wider transition-all ${
+  `border-2 px-3 sm:px-4 py-2 min-h-[44px] text-xs sm:text-sm font-bold uppercase tracking-wide whitespace-nowrap flex items-center justify-start transition-all ${
     isActive
       ? "bg-primary text-primary-foreground border-black dark:border-primary-foreground"
       : "bg-card text-foreground border-border hover:bg-muted"
@@ -18,14 +18,14 @@ export default function AppShell({ children }) {
   return (
     <div className="min-h-screen bg-background text-foreground" data-testid="app-shell-root">
       <header className="border-b-2 border-border bg-card" data-testid="main-header">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 flex flex-wrap gap-4 items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
           <div className="space-y-1" data-testid="brand-block">
             <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">AI Assignment Grading</p>
             <h1 className="font-heading text-3xl font-extrabold tracking-tight" data-testid="app-main-title">
               ZenGrade Control Room
             </h1>
           </div>
-          <div className="flex items-center gap-3" data-testid="header-user-info">
+          <div className="w-full sm:w-auto flex items-center justify-between sm:justify-end gap-3" data-testid="header-user-info">
             <Button
               variant="outline"
               onClick={toggleTheme}

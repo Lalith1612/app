@@ -51,7 +51,7 @@ export default function LoginPage() {
         </h2>
       </section>
 
-      <section className="grid place-items-center p-6 relative" data-testid="login-form-panel">
+      <section className="grid place-items-start lg:place-items-center p-6 pt-24 lg:pt-6 relative" data-testid="login-form-panel">
         <Button
           variant="outline"
           onClick={toggleTheme}
