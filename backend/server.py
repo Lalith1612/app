@@ -6,14 +6,15 @@ from pathlib import Path
 from tempfile import NamedTemporaryFile
 from typing import Dict, List
 
+import certifi
 import pandas as pd
 from dotenv import load_dotenv
 from fastapi import APIRouter, Depends, FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
-from starlette.background import BackgroundTask
 from motor.motor_asyncio import AsyncIOMotorClient
+from starlette.background import BackgroundTask
 
 try:
     from auth_utils import (
@@ -23,7 +24,7 @@ try:
         get_token_from_auth,
         verify_password,
     )
-    from document_processing import expand_submission_file, is_allowed_file, extract_student_information
+    from document_processing import expand_submission_file, extract_student_information, is_allowed_file
     from grading_engine import grade_answers, parse_max_marks_map
     from plagiarism_engine import calculate_plagiarism_flags
     from schemas import (
@@ -47,7 +48,7 @@ except ImportError:
         get_token_from_auth,
         verify_password,
     )
-    from .document_processing import expand_submission_file, is_allowed_file, extract_student_information
+    from .document_processing import expand_submission_file, extract_student_information, is_allowed_file
     from .grading_engine import grade_answers, parse_max_marks_map
     from .plagiarism_engine import calculate_plagiarism_flags
     from .schemas import (
@@ -70,13 +71,12 @@ load_dotenv(ROOT_DIR / ".env")
 
 mongo_url = os.environ.get("MONGO_URL", "mongodb://localhost:27017")
 
-# Use certifi CA bundle for Atlas TLS (fixes SSL handshake errors)
-try:
-    import certifi
-    client = AsyncIOMotorClient(mongo_url, tlsCAFile=certifi.where())
-except ImportError:
-    client = AsyncIOMotorClient(mongo_url)
-
+# certifi provides up-to-date CA certificates required for MongoDB Atlas TLS
+client = AsyncIOMotorClient(
+    mongo_url,
+    tlsCAFile=certifi.where(),
+    serverSelectionTimeoutMS=10000,
+)
 db = client[os.environ.get("DB_NAME", "zengrade")]
 
 app = FastAPI(title="AI Assignment Grading System", version="1.0.0")
@@ -85,7 +85,6 @@ api_router = APIRouter(prefix="/api")
 MAX_FILE_SIZE_MB = 15
 JOBS: Dict[str, Dict] = {}
 
-# Serve built React frontend if it exists
 FRONTEND_BUILD = Path(__file__).parent.parent / "frontend" / "build"
 
 
@@ -108,13 +107,16 @@ def _validate_owner(resource: Dict, instructor_email: str) -> None:
 
 @app.on_event("startup")
 async def startup_indexes() -> None:
+    # Wrapped in try/except so a slow DB connection doesn't crash the app
     try:
         await db.instructors.create_index("email", unique=True)
         await db.sessions.create_index("id", unique=True)
         await db.submissions.create_index("id", unique=True)
         await db.jobs.create_index("id", unique=True)
-    except Exception as e:
-        print(f"WARNING: Could not create indexes: {e}")
+        print("INFO: MongoDB indexes created successfully.")
+    except Exception as exc:
+        print(f"WARNING: Could not create DB indexes on startup: {exc}")
+        print("App will continue running. Indexes will be created on first write.")
 
 
 @api_router.get("/")
@@ -346,7 +348,10 @@ async def _process_grading_job(job_id: str, session_doc: Dict, ai_provider: str)
         job["updated_at"] = utcnow()
         await _upsert_job(job)
 
-    graded = await db.submissions.find({"session_id": session_doc["id"], "status": {"$in": ["graded", "reviewed", "approved"]}}, {"_id": 0}).to_list(2000)
+    graded = await db.submissions.find(
+        {"session_id": session_doc["id"], "status": {"$in": ["graded", "reviewed", "approved"]}},
+        {"_id": 0},
+    ).to_list(2000)
     plagiarism_map = calculate_plagiarism_flags(graded)
     for submission in graded:
         plagiarism = plagiarism_map.get(submission["id"], {})
@@ -451,32 +456,22 @@ async def analytics(session_id: str, current: Dict = Depends(get_current_instruc
         raise HTTPException(status_code=404, detail="Session not found")
     _validate_owner(session_doc, current["email"])
 
-    rows = await db.submissions.find({"session_id": session_id, "status": {"$in": ["graded", "reviewed", "approved"]}}, {"_id": 0}).to_list(5000)
+    rows = await db.submissions.find(
+        {"session_id": session_id, "status": {"$in": ["graded", "reviewed", "approved"]}},
+        {"_id": 0},
+    ).to_list(5000)
     if not rows:
-        return {
-            "average": 0,
-            "highest": 0,
-            "lowest": 0,
-            "distribution": [],
-            "question_difficulty": [],
-            "total_submissions": 0,
-        }
+        return {"average": 0, "highest": 0, "lowest": 0, "distribution": [], "question_difficulty": [], "total_submissions": 0}
 
     scores = [item.get("total_score", 0) for item in rows]
     average = round(sum(scores) / max(len(scores), 1), 2)
-    highest = max(scores)
-    lowest = min(scores)
-
     bins = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
     distribution = []
     for index, (start, end) in enumerate(zip(bins, bins[1:])):
-        if index == len(bins) - 2:
-            count = len([s for s in scores if start <= s <= end])
-        else:
-            count = len([s for s in scores if start <= s < end])
+        count = len([s for s in scores if start <= s <= end if index == len(bins) - 2 else start <= s < end])
         distribution.append({"range": f"{start}-{end}", "count": count})
 
-    question_totals: Dict[str, Dict[str, float]] = {}
+    question_totals: Dict[str, Dict] = {}
     for row in rows:
         for q in row.get("grading", []):
             qid = q["question_id"]
@@ -493,8 +488,8 @@ async def analytics(session_id: str, current: Dict = Depends(get_current_instruc
 
     return {
         "average": average,
-        "highest": highest,
-        "lowest": lowest,
+        "highest": max(scores),
+        "lowest": min(scores),
         "distribution": distribution,
         "question_difficulty": difficulty,
         "total_submissions": len(rows),
@@ -529,7 +524,6 @@ async def export_grades(session_id: str, current: Dict = Depends(get_current_ins
     temp = NamedTemporaryFile(delete=False, suffix=".xlsx")
     dataframe.to_excel(temp.name, index=False)
     file_path = Path(temp.name)
-
     safe_title = session_doc["title"].replace(" ", "_")
     return FileResponse(
         temp.name,
@@ -561,6 +555,7 @@ async def plagiarism_report(session_id: str, current: Dict = Depends(get_current
     return {"flagged_count": len(flagged), "flagged_submissions": flagged}
 
 
+# ── Register router & middleware ──────────────────────────────────────────────
 app.include_router(api_router)
 
 app.add_middleware(
@@ -571,22 +566,18 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Serve React frontend static assets
+# ── Serve built React frontend ────────────────────────────────────────────────
+@app.get("/health")
+async def health() -> Dict[str, str]:
+    return {"status": "ok"}
+
 if FRONTEND_BUILD.exists():
     app.mount("/static", StaticFiles(directory=str(FRONTEND_BUILD / "static")), name="static")
-
-    @app.get("/health")
-    async def health() -> Dict[str, str]:
-        return {"status": "ok"}
 
     @app.get("/{full_path:path}", response_class=HTMLResponse)
     async def serve_react(full_path: str) -> HTMLResponse:
         index_file = FRONTEND_BUILD / "index.html"
         return HTMLResponse(content=index_file.read_text(), status_code=200)
-else:
-    @app.get("/health")
-    async def health() -> Dict[str, str]:
-        return {"status": "ok", "note": "frontend build not found"}
 
 
 @app.on_event("shutdown")
