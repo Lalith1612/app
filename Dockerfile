@@ -6,6 +6,7 @@ COPY backend /app/backend
 
 FROM node:20-alpine AS frontend-builder
 WORKDIR /app/frontend
+ENV NODE_OPTIONS="--max-old-space-size=256"
 COPY frontend/package.json ./
 RUN yarn install --network-timeout 600000 --prefer-offline
 COPY frontend /app/frontend
