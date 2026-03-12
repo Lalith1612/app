@@ -20,17 +20,41 @@
 # COPY --from=frontend-builder /app/frontend/build /app/frontend/build
 # EXPOSE 8001
 # CMD ["python", "-m", "uvicorn", "backend.server:app", "--host", "0.0.0.0", "--port", "8001"]
+# ─── Stage 1: Build frontend ───────────────────────────────────────────────
+FROM node:20-alpine AS frontend-builder
+
+WORKDIR /app/frontend
+
+# Copy package files first for better layer caching
+COPY frontend/package.json frontend/yarn.lock* ./
+
+# Install dependencies (skip devDependencies in prod build)
+RUN yarn install --frozen-lockfile --network-timeout 600000
+
+# Copy frontend source and build
+COPY frontend ./
+RUN yarn build
+
+# ─── Stage 2: Final image ───────────────────────────────────────────────────
 FROM python:3.11-slim
 
 WORKDIR /app
 
-# install dependencies
+# Install system dependencies needed by PyMuPDF / pdfplumber
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libmupdf-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Python dependencies
 COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# copy backend only
+# Copy backend source
 COPY backend /app/backend
+
+# Copy built frontend from Stage 1
+COPY --from=frontend-builder /app/frontend/build /app/frontend/build
 
 EXPOSE 8001
 
-CMD ["python","-m","uvicorn","backend.server:app","--host","0.0.0.0","--port","8001"]
+CMD ["python", "-m", "uvicorn", "backend.server:app", "--host", "0.0.0.0", "--port", "8001"]
