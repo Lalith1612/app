@@ -10,7 +10,8 @@ import pandas as pd
 from dotenv import load_dotenv
 from fastapi import APIRouter, Depends, FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, HTMLResponse
+from fastapi.staticfiles import StaticFiles
 from starlette.background import BackgroundTask
 from motor.motor_asyncio import AsyncIOMotorClient
 
@@ -67,15 +68,18 @@ except ImportError:
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / ".env")
 
-mongo_url = os.environ["MONGO_URL"]
+mongo_url = os.environ.get("MONGO_URL", "mongodb://localhost:27017")
 client = AsyncIOMotorClient(mongo_url)
-db = client[os.environ["DB_NAME"]]
+db = client[os.environ.get("DB_NAME", "zengrade")]
 
 app = FastAPI(title="AI Assignment Grading System", version="1.0.0")
 api_router = APIRouter(prefix="/api")
 
 MAX_FILE_SIZE_MB = 15
 JOBS: Dict[str, Dict] = {}
+
+# Serve built React frontend if it exists
+FRONTEND_BUILD = Path(__file__).parent.parent / "frontend" / "build"
 
 
 def utcnow() -> datetime:
@@ -556,6 +560,23 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Serve React frontend static assets
+if FRONTEND_BUILD.exists():
+    app.mount("/static", StaticFiles(directory=str(FRONTEND_BUILD / "static")), name="static")
+
+    @app.get("/health")
+    async def health() -> Dict[str, str]:
+        return {"status": "ok"}
+
+    @app.get("/{full_path:path}", response_class=HTMLResponse)
+    async def serve_react(full_path: str) -> HTMLResponse:
+        index_file = FRONTEND_BUILD / "index.html"
+        return HTMLResponse(content=index_file.read_text(), status_code=200)
+else:
+    @app.get("/health")
+    async def health() -> Dict[str, str]:
+        return {"status": "ok", "note": "frontend build not found"}
 
 
 @app.on_event("shutdown")
