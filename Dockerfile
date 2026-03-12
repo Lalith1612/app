@@ -7,7 +7,7 @@ COPY backend /app/backend
 FROM node:20-alpine AS frontend-builder
 WORKDIR /app/frontend
 COPY frontend/package.json ./
-RUN yarn install
+RUN yarn install --network-timeout 600000 --prefer-offline
 COPY frontend /app/frontend
 RUN yarn build
 
