@@ -5,8 +5,7 @@ import uuid
 from typing import Dict, List
 
 import httpx
-from emergentintegrations.llm.chat import LlmChat, UserMessage
-from langchain_core.prompts import ChatPromptTemplate
+import google.generativeai as genai
 
 
 def parse_max_marks_map(rubric_text: str) -> Dict[str, float]:
@@ -25,7 +24,7 @@ def _extract_relevant_context(question_id: str, answer_key_text: str, rubric_tex
     return (answer_key_text + "\n\n" + rubric_text)[:3500]
 
 
-def _safe_json_extract(text: str) -> Dict[str, float | str]:
+def _safe_json_extract(text: str) -> Dict:
     cleaned = text.strip()
     cleaned = re.sub(r"^```json", "", cleaned, flags=re.IGNORECASE).strip()
     cleaned = re.sub(r"```$", "", cleaned).strip()
@@ -47,7 +46,7 @@ def _safe_json_extract(text: str) -> Dict[str, float | str]:
     return {}
 
 
-def _keyword_score(student_answer: str, answer_key: str, max_marks: float) -> Dict[str, float | str]:
+def _keyword_score(student_answer: str, answer_key: str, max_marks: float) -> Dict:
     key_tokens = [w.lower() for w in re.findall(r"[A-Za-z]{4,}", answer_key)]
     answer_tokens = {w.lower() for w in re.findall(r"[A-Za-z]{4,}", student_answer)}
 
@@ -59,20 +58,35 @@ def _keyword_score(student_answer: str, answer_key: str, max_marks: float) -> Di
     overlap = len(important.intersection(answer_tokens))
     ratio = overlap / max(1, len(important))
     score = min(max_marks, max_marks * min(1.0, ratio * 1.35))
-    reason = "Scored using local keyword overlap fallback due model response issue."
-    return {"score": round(score, 2), "reason": reason}
+    return {"score": round(score, 2), "reason": "Scored using local keyword overlap fallback due model response issue."}
+
+
+def _build_prompt(question_id: str, max_marks: float, student_answer: str, context: str) -> str:
+    return f"""Grade this student answer.
+Question ID: {question_id}
+Max Marks: {max_marks}
+Student Answer:
+{student_answer}
+
+Reference Context (RAG from answer key + rubric):
+{context}
+
+Return strict JSON only:
+{{"score": number, "reason": "short explanation"}}
+"""
 
 
 async def _grade_with_gemini(prompt: str) -> str:
     api_key = os.environ.get("GEMINI_API_KEY")
     if not api_key:
         raise RuntimeError("GEMINI_API_KEY is missing")
-    chat = LlmChat(
-        api_key=api_key,
-        session_id=f"grading-{uuid.uuid4()}",
-        system_message="You are a strict but fair grading assistant. Return exact JSON only.",
-    ).with_model("gemini", "gemini-3-flash-preview")
-    return await chat.send_message(UserMessage(text=prompt))
+    genai.configure(api_key=api_key)
+    model = genai.GenerativeModel(
+        model_name="gemini-1.5-flash",
+        system_instruction="You are a strict but fair grading assistant. Return exact JSON only.",
+    )
+    response = model.generate_content(prompt)
+    return response.text
 
 
 async def _grade_with_local_model(prompt: str) -> str:
@@ -96,38 +110,16 @@ async def grade_answers(
     rubric_text: str,
     max_marks_map: Dict[str, float],
     ai_provider: str,
-) -> Dict[str, List[Dict[str, float | str]] | float]:
-    grading_rows: List[Dict[str, float | str]] = []
+) -> Dict:
+    grading_rows = []
     total = 0.0
-
-    template = ChatPromptTemplate.from_template(
-        """
-        Grade this student answer.
-        Question ID: {question_id}
-        Max Marks: {max_marks}
-        Student Answer:
-        {student_answer}
-
-        Reference Context (RAG from answer key + rubric):
-        {context}
-
-        Return strict JSON only:
-        {{"score": number, "reason": "short explanation"}}
-        """
-    )
 
     for question_id, student_answer in answers.items():
         qid = question_id.upper()
         max_marks = max_marks_map.get(qid, 5.0)
         context = _extract_relevant_context(qid, answer_key_text, rubric_text)
-        prompt = template.format(
-            question_id=qid,
-            max_marks=max_marks,
-            student_answer=student_answer[:4500],
-            context=context,
-        )
+        prompt = _build_prompt(qid, max_marks, student_answer[:4500], context)
 
-        model_result: Dict[str, float | str]
         try:
             if ai_provider == "local":
                 raw = await _grade_with_local_model(prompt)
