@@ -1,26 +1,17 @@
-.git
-.gitignore
-node_modules
-frontend/node_modules
-frontend/build
+FROM python:3.11-slim
 
-memory
-test_reports
-tests
-deployment
+WORKDIR /app
 
-__pycache__
-*.pyc
-*.pyo
-*.log
+# Install backend dependencies
+COPY backend/requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-.env
-.env.*
+# Copy backend code
+COPY backend /app/backend
 
-*.zip
-*.tar
-*.tar.gz
-*.pt
-*.pth
-*.onnx
-*.bin
+# Copy frontend build (if present)
+COPY frontend /app/frontend
+
+EXPOSE 8001
+
+CMD ["python","-m","uvicorn","backend.server:app","--host","0.0.0.0","--port","8001"]
