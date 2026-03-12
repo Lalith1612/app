@@ -11,7 +11,7 @@ from typing import Dict, List, Tuple
 import docx2txt
 import fitz
 import pdfplumber
-from emergentintegrations.llm.chat import LlmChat, UserMessage
+import google.generativeai as genai
 
 
 ALLOWED_EXTENSIONS = {".pdf", ".docx", ".txt", ".zip"}
@@ -158,13 +158,13 @@ async def _llm_extract_student_fields(raw_text: str, question_paper_text: str = 
     """
 
     try:
-        chat = LlmChat(
-            api_key=gemini_key,
-            session_id=f"extract-{uuid.uuid4()}",
-            system_message="You extract assignment metadata into strict JSON.",
-        ).with_model("gemini", "gemini-3-flash-preview")
-        response = await chat.send_message(UserMessage(text=prompt))
-        parsed = _safe_json_extract(response)
+        genai.configure(api_key=gemini_key)
+        model = genai.GenerativeModel(
+            model_name="gemini-1.5-flash",
+            system_instruction="You extract assignment metadata into strict JSON.",
+        )
+        response = model.generate_content(prompt)
+        parsed = _safe_json_extract(response.text)
         return parsed if isinstance(parsed, dict) else {}
     except Exception:
         return {}
@@ -190,7 +190,7 @@ def expand_submission_file(filename: str, file_bytes: bytes) -> List[Tuple[str, 
     return extracted_docs
 
 
-async def extract_student_information(raw_text: str, question_paper_text: str = "") -> Dict[str, str | Dict[str, str] | List[str]]:
+async def extract_student_information(raw_text: str, question_paper_text: str = "") -> Dict:
     normalized = raw_text.replace("\r", "\n")
     flags: List[str] = []
 
