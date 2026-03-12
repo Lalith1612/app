@@ -69,7 +69,14 @@ ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / ".env")
 
 mongo_url = os.environ.get("MONGO_URL", "mongodb://localhost:27017")
-client = AsyncIOMotorClient(mongo_url)
+
+# Use certifi CA bundle for Atlas TLS (fixes SSL handshake errors)
+try:
+    import certifi
+    client = AsyncIOMotorClient(mongo_url, tlsCAFile=certifi.where())
+except ImportError:
+    client = AsyncIOMotorClient(mongo_url)
+
 db = client[os.environ.get("DB_NAME", "zengrade")]
 
 app = FastAPI(title="AI Assignment Grading System", version="1.0.0")
@@ -101,10 +108,13 @@ def _validate_owner(resource: Dict, instructor_email: str) -> None:
 
 @app.on_event("startup")
 async def startup_indexes() -> None:
-    await db.instructors.create_index("email", unique=True)
-    await db.sessions.create_index("id", unique=True)
-    await db.submissions.create_index("id", unique=True)
-    await db.jobs.create_index("id", unique=True)
+    try:
+        await db.instructors.create_index("email", unique=True)
+        await db.sessions.create_index("id", unique=True)
+        await db.submissions.create_index("id", unique=True)
+        await db.jobs.create_index("id", unique=True)
+    except Exception as e:
+        print(f"WARNING: Could not create indexes: {e}")
 
 
 @api_router.get("/")
