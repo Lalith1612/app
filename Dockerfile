@@ -21,6 +21,7 @@
 # EXPOSE 8001
 # CMD ["python", "-m", "uvicorn", "backend.server:app", "--host", "0.0.0.0", "--port", "8001"]
 # ─── Stage 1: Build frontend ───────────────────────────────────────────────
+# ─── Stage 1: Build frontend ───────────────────────────────────────────────
 FROM node:20-alpine AS frontend-builder
 
 WORKDIR /app/frontend
