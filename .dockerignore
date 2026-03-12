@@ -1,16 +1,40 @@
+# Git
 .git
 .gitignore
-node_modules
-frontend
-memory
-database
-tests
-test_reports
-deployment
 
+# Node
+node_modules
+frontend/node_modules
+
+# Python cache
 __pycache__
 *.pyc
 *.pyo
-*.log
+*.pyd
+.Python
+
+# Env files (use Railway environment variables instead)
 .env
 .env.*
+
+# Large binary / model files
+*.pt
+*.pth
+*.onnx
+*.bin
+*.zip
+*.tar
+*.tar.gz
+
+# Dev / test artifacts
+test_reports
+tests
+backend/tests
+deployment
+memory
+ai_engine
+
+# Misc
+*.log
+.DS_Store
+README.md
