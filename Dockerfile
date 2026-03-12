@@ -24,18 +24,13 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# Install backend dependencies
+# install dependencies
 COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy backend code
+# copy backend only
 COPY backend /app/backend
-
-# Copy frontend source (no build step)
-COPY frontend/src /app/frontend/src
-COPY frontend/public /app/frontend/public
-COPY frontend/package.json /app/frontend/package.json
 
 EXPOSE 8001
 
-CMD ["python", "-m", "uvicorn", "backend.server:app", "--host", "0.0.0.0", "--port", "8001"]
+CMD ["python","-m","uvicorn","backend.server:app","--host","0.0.0.0","--port","8001"]
