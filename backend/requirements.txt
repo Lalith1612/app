@@ -23,16 +23,16 @@ docx2txt==0.9
 openpyxl==3.1.5
 pillow==10.4.0
 
-# Data / ML (lightweight only - no torch)
+# Data / ML (lightweight - no torch)
 numpy==1.26.4
 scikit-learn==1.5.2
 pandas==2.2.3
 
-# LLM / AI integrations
-openai==1.35.0
+# AI - Gemini via official SDK (replaces emergentintegrations)
+google-generativeai==0.8.3
+
+# HTTP client (used by local model grading)
 httpx==0.27.0
-emergentintegrations>=0.1.0
-langchain-core==0.2.0
 
 # Utilities
 pydantic==2.7.4
@@ -40,11 +40,5 @@ pydantic_core==2.18.4
 python-dotenv==1.0.1
 email-validator==2.2.0
 orjson==3.10.5
-aiohttp==3.9.5
 requests==2.32.3
 tenacity==8.3.0
-tqdm==4.66.4
-tiktoken==0.7.0
-
-# Dev/test (optional - can remove for smaller image)
-pytest==8.2.2
