@@ -468,7 +468,10 @@ async def analytics(session_id: str, current: Dict = Depends(get_current_instruc
     bins = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
     distribution = []
     for index, (start, end) in enumerate(zip(bins, bins[1:])):
-        count = len([s for s in scores if start <= s <= end if index == len(bins) - 2 else start <= s < end])
+        if index == len(bins) - 2:
+            count = len([s for s in scores if start <= s <= end])
+        else:
+            count = len([s for s in scores if start <= s < end])
         distribution.append({"range": f"{start}-{end}", "count": count})
 
     question_totals: Dict[str, Dict] = {}
