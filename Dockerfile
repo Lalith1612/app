@@ -32,7 +32,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY backend /app/backend
 
 # Copy frontend source (no build step)
-COPY frontend /app/frontend
+COPY frontend/src /app/frontend/src
+COPY frontend/public /app/frontend/public
+COPY frontend/package.json /app/frontend/package.json
 
 EXPOSE 8001
 
